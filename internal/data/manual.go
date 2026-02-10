@@ -7,14 +7,12 @@ import (
 // aqui ficam as funcoes sql
 
 func InsertManual(manual models.Manual){
-	stmt := "INSERT INTO manuais(titulo, conteudo, secao) VALUES(?, ?, ?)"
+	stmt := "INSERT INTO manuais(titulo, conteudo, secao, arquivo) VALUES(?, ?, ?)"
 	_, err := DB.Exec(stmt, manual.Titulo, manual.Conteudo, manual.Secao)
 	
-	if err != nil{
-		return
-	}
+	
 }
-func GetManuais()[]models.Manual{
+func GetManuais()[]models.Manual{ //parei aqui
 	query := "SELECT * FROM manuais"
 	var list []models.Manual
 	queryResult, err := DB.Query(query)
