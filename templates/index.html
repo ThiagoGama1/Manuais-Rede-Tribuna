@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manuais Tribuna</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+    /* VARIÁVEIS DE CORES (A PALETA TRIBUNA) */
+    :root {
+        --background-body: #f3f4f6;
+        --background: #ffffff;
+        --text-main: #1f2937;
+        --text-bright: #ffffff;
+        --links: #b91c1c;
+        --focus: #ef4444;
+        --border: #e5e7eb;
+        --content-width: 900px;
+        --button-hover: #991b1b;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background-color: var(--background-body);
+        padding: 40px 20px;
+    }
+
+    h1 {
+        color: #111;
+        border-bottom: 4px solid var(--links);
+        display: inline-block;
+        padding-bottom: 10px;
+        margin-bottom: 40px;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    /* ESTILO NOVO: TÍTULOS DAS SEÇÕES */
+    h2 {
+        color: var(--text-main);
+        margin-top: 50px;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        border-left: 5px solid var(--links);
+        padding-left: 15px;
+        background: rgba(0,0,0,0.03);
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+    }
+
+    a[href="/novo"] {
+        background-color: var(--links);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(185, 28, 28, 0.3);
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+    a[href="/novo"]:hover {
+        background-color: var(--button-hover);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        background: white;
+        border: 1px solid var(--border);
+        margin-bottom: 15px;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+    }
+
+    li:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid var(--links);
+    }
+
+    li a strong {
+        font-size: 1.1rem;
+        color: #374151;
+    }
+    
+    form { margin: 0; }
+    
+    button {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: bold;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    button[style*="red"] {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+    button[style*="red"]:hover {
+        background-color: #fecaca !important;
+    }
+
+    button[style*="chocolate"] {
+        background-color: #fff7ed !important;
+        color: #9a3412 !important;
+    }
+    
+    /* ETIQUETA PEQUENA PARA IDENTIFICAR SEÇÃO NO CARD (OPCIONAL) */
+    .tag-secao {
+        font-size: 0.7rem;
+        background: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #666;
+        margin-left: 10px;
+        text-transform: uppercase;
+    }
+    </style>
+</head>
+<body>
+    <a href="/novo"> + Criar Nova Função</a>
+    <hr>
+
+    <h1>Base de Conhecimento Rede Tribuna</h1>
+
+    <h2>📺 TV Tribuna</h2>
+    <ul>
+        {{ range .Manuais }}
+            {{ if eq .Secao "TV" }}
+            <li>
+                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
+                <div>
+                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
+                        <button type="submit" style="color: chocolate;">Editar</button>
+                    </form>
+                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
+                        <button type="submit" style="color: red;">Excluir</button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ul>
+
+    <h2>📻 Rádios</h2>
+    <ul>
+        {{ range .Manuais }}
+            {{ if eq .Secao "Rádio" }}
+            <li>
+                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
+                <div>
+                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
+                        <button type="submit" style="color: chocolate;">Editar</button>
+                    </form>
+                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
+                        <button type="submit" style="color: red;">Excluir</button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ul>
+
+    <h2>📰 Jornal</h2>
+    <ul>
+        {{ range .Manuais }}
+            {{ if eq .Secao "Jornal" }}
+            <li>
+                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
+                <div>
+                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
+                        <button type="submit" style="color: chocolate;">Editar</button>
+                    </form>
+                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
+                        <button type="submit" style="color: red;">Excluir</button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ul>
+
+    <h2>💻 Tribuna Online</h2>
+    <ul>
+        {{ range .Manuais }}
+            {{ if eq .Secao "Online" }}
+            <li>
+                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
+                <div>
+                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
+                        <button type="submit" style="color: chocolate;">Editar</button>
+                    </form>
+                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
+                        <button type="submit" style="color: red;">Excluir</button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ul>
+    
+    <h2>📂 Geral / Outros</h2>
+    <ul>
+        {{ range .Manuais }}
+            {{ if eq .Secao "" }}
+            <li>
+                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> <span class="tag-secao">Sem categoria</span></a>
+                <div>
+                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
+                        <button type="submit" style="color: chocolate;">Editar</button>
+                    </form>
+                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
+                        <button type="submit" style="color: red;">Excluir</button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ul>
+
+</body>
+</html>

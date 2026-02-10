@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Novo Manual</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+    /* VARIÁVEIS DE CORES (A PALETA TRIBUNA) */
+    :root {
+        --background-body: #f3f4f6; /* Fundo cinza moderno (não branco estourado) */
+        --background: #ffffff;      /* Fundo dos cartões */
+        --text-main: #1f2937;       /* Texto cinza escuro profissional */
+        --text-bright: #ffffff;     /* Texto dos botões */
+        --links: #b91c1c;           /* VERMELHO SANGUE (Cor de destaque) */
+        --focus: #ef4444;           /* Vermelho mais claro ao clicar */
+        --border: #e5e7eb;          /* Cor das bordas sutis */
+        --content-width: 900px;     /* Largura um pouco maior */
+        --button-hover: #991b1b;    /* Vermelho escuro ao passar o mouse */
+    }
+
+    /* CORPO DA PÁGINA (A "MESA" ONDE ESTÁ O PAPEL) */
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background-color: var(--background-body);
+        padding: 40px 20px;
+    }
+
+    /* O TÍTULO PRINCIPAL */
+    h1 {
+        color: #111;
+        border-bottom: 4px solid var(--links); /* Linha vermelha grossa embaixo */
+        display: inline-block;
+        padding-bottom: 10px;
+        margin-bottom: 40px;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    /* O LINK DE "CRIAR NOVA FUNÇÃO" */
+    a[href="/novo"] {
+        background-color: var(--links);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(185, 28, 28, 0.3);
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+    a[href="/novo"]:hover {
+        background-color: var(--button-hover);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    /* A LISTA DE MANUAIS (TIRA AS BOLINHAS FEIAS) */
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    /* CADA MANUAL É UM "CARD" AGORA */
+    li {
+        background: white;
+        border: 1px solid var(--border);
+        margin-bottom: 15px;
+        padding: 20px;
+        border-radius: 12px; /* Cantos arredondados */
+        display: flex;       /* Mágica: Título na esquerda, botões na direita */
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra leve */
+        transition: all 0.2s ease;
+    }
+
+    /* EFEITO AO PASSAR O MOUSE NO MANUAL */
+    li:hover {
+        transform: translateY(-3px); /* Sobe um pouquinho */
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Sombra aumenta */
+        border-left: 5px solid var(--links); /* Detalhe vermelho na esquerda */
+    }
+
+    /* O LINK DO TÍTULO DO MANUAL */
+    li a strong {
+        font-size: 1.1rem;
+        color: #374151;
+    }
+    
+    /* OS BOTÕES DE AÇÃO (EXCLUIR/EDITAR) */
+    form {
+        margin: 0; /* Remove margem padrão */
+    }
+    
+    button {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: bold;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    /* Botão Excluir (Deixar mais discreto ou agressivo?) */
+    button[style*="red"] {
+        background-color: #fee2e2 !important; /* Fundo vermelho bem clarinho */
+        color: #991b1b !important; /* Texto vermelho escuro */
+    }
+    button[style*="red"]:hover {
+        background-color: #fecaca !important;
+    }
+
+    /* Botão Editar */
+    button[style*="chocolate"] {
+        background-color: #fff7ed !important; /* Laranja clarinho */
+        color: #9a3412 !important; /* Laranja escuro */
+    }
+
+    /* CAMPOS DE FORMULÁRIO */
+    select, input[type="text"], textarea {
+        background-color: #ffffff;
+        color: var(--text-main);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 500px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    select:focus, input[type="text"]:focus, textarea:focus {
+        outline: none;
+        border-color: var(--links);
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+    }
+
+    select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231f2937' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+
+    select option {
+        background-color: #ffffff;
+        color: var(--text-main);
+        padding: 10px;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 6px;
+        display: inline-block;
+    }
+
+    button[type="submit"] {
+        background-color: var(--links);
+        color: white;
+        padding: 12px 24px;
+        font-size: 1rem;
+        margin-top: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: var(--button-hover);
+    }
+</style>
+</head>
+<body>
+    <h1>Adicionar Nova Função</h1>
+    
+    <form method="POST" action="/criar">
+        <label>Seção / Departamento:</label><br>
+        <select name="secao" required>
+            <option value="" disabled selected>Selecione uma opção...</option>
+            <option value="TV">TV Tribuna</option>
+            <option value="Rádio">Rádio</option>
+            <option value="Jornal">Jornal</option>
+            <option value="Online">Tribuna Online</option>
+        </select><br><br>
+        <label>Título da Função:</label><br>
+        <input type="text" name="titulo" required><br><br>
+
+        <label>Passo a Passo (Conteúdo):</label><br>
+        <textarea name="conteudo" rows="5" cols="40" required></textarea><br><br>
+
+        <button type="submit">Salvar Manual</button>
+    </form>
+    
+    <a href="/">Cancelar</a>
+</body>
+</html>
