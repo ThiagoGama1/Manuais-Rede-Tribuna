@@ -6,11 +6,15 @@ import (
 
 // aqui ficam as funcoes sql
 
-func InsertManual(manual models.Manual){
-	stmt := "INSERT INTO manuais(titulo, conteudo, secao, arquivo) VALUES(?, ?, ?)"
-	_, err := DB.Exec(stmt, manual.Titulo, manual.Conteudo, manual.Secao)
+func InsertManual(manual models.Manual)(int64, error) {
+	stmt := "INSERT INTO manuais(titulo, conteudo, secao) VALUES(?, ?, ?)"
+	resp, err := DB.Exec(stmt, manual.Titulo, manual.Conteudo, manual.Secao)
 	
-	
+	if err != nil{
+		return 0, err
+	}
+	id, err := resp.LastInsertId()
+	return id, nil
 }
 func GetManuais()[]models.Manual{ //parei aqui
 	query := "SELECT * FROM manuais"
