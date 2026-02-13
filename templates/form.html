@@ -180,7 +180,7 @@
 <body>
     <h1>Adicionar Nova Função</h1>
     
-    <form method="POST" action="/criar">
+    <form method="POST" action="/criar" enctype="multipart/form-data">
         <label>Seção / Departamento:</label><br>
         <select name="secao" required>
             <option value="" disabled selected>Selecione uma opção...</option>
@@ -194,6 +194,9 @@
 
         <label>Passo a Passo (Conteúdo):</label><br>
         <textarea name="conteudo" rows="5" cols="40" required></textarea><br><br>
+
+        <label>Anexos (PDF, Imagens, etc):</label><br>
+        <input type="file" name="arquivos" multiple><br><br>
 
         <button type="submit">Salvar Manual</button>
     </form>

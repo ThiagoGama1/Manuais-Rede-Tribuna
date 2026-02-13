@@ -48,13 +48,37 @@ func CriarManual(c *gin.Context){
 	CriarNovoId(&novoId)
 	inputTitulo := c.PostForm("titulo")
 	inputConteudo := c.PostForm("conteudo")
-	inputSecao := c.PostForm("secao")
+	inputSecao := c.PostForm("secao") 
+	form, err := c.MultipartForm()
+	var novoManual models.Manual
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+
 	if strings.TrimSpace(inputTitulo) == "" || strings.TrimSpace(inputConteudo) == "" || strings.TrimSpace(inputSecao) == ""{
 		c.Redirect(http.StatusFound, "/novo")
 		return
 	}
+	var listaAnexos []models.Anexo
+	for _, arquivo := range form.File["arquivos"]{
+		destino := "./uploads/" + arquivo.Filename
+		
+		if err := c.SaveUploadedFile(arquivo, destino); err != nil{
+			log.Println("Erro ao salvar o arquivo:", err)
+			continue
+		}
 
-	novoManual := models.Manual{ID: novoId, Titulo: inputTitulo, Conteudo: inputConteudo, Secao: inputSecao}
+		novoAnexo := models.Anexo{
+			Nome: arquivo.Filename,
+			Tamanho_bytes: int(arquivo.Size),
+			Caminho: destino,
+			Tipo_arquivo: arquivo.Header.Get("Content-Type"),
+		}
+		listaAnexos = append(listaAnexos, novoAnexo)
+	}
+	
+	novoManual = models.Manual{ID: novoId, Titulo: inputTitulo, Conteudo: inputConteudo, Secao: inputSecao, Arquivos: listaAnexos}
 	data.InsertManual(novoManual)
 	c.Redirect(http.StatusSeeOther, "/")
 }
