@@ -4,6 +4,32 @@
     <title>{{ .Titulo }} - Manual</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <style>
+    /* ESTILOS DOS ANEXOS */
+    .anexos-container {
+        margin-top: 40px;
+    }
+    .anexos-container h3 {
+        color: var(--text-main);
+        border-left: 4px solid var(--links);
+        padding-left: 10px;
+    }
+    .anexo-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+    }
+    .anexo-item a {
+        color: var(--links);
+        font-weight: bold;
+        text-decoration: none;
+    }
+    .anexo-item a:hover {
+        text-decoration: underline;
+    }
     /* VARIÁVEIS DE CORES (A PALETA TRIBUNA) */
     :root {
         --background-body: #f3f4f6; /* Fundo cinza moderno (não branco estourado) */
@@ -127,5 +153,15 @@
     <div class="conteudo">
         <p>{{ .Conteudo }}</p>
     </div>
+    {{ if .Arquivos }}
+    <div class="anexos-container">
+        <h3>📎 Anexos deste manual</h3>
+        {{ range .Arquivos }}
+            <div class="anexo-item">
+                <a href="/uploads/{{ .Nome }}" target="_blank">{{ .Nome }}</a>
+            </div>
+        {{ end }}
+    </div>
+    {{ end }}
 </body>
 </html>

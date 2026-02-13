@@ -32,20 +32,9 @@ func ExibirManualPorId(c *gin.Context){
 	c.HTML(http.StatusOK, "visualizar.html", copiaManual)
 }
 
-func CriarNovoId(id *int) {
-	for _, m := range data.GetManuais() {
-		if m.ID > *id{
-			*id = m.ID
-		}
-	}
-	*id += 1
-
-}
-
 func CriarManual(c *gin.Context){
 	//novoId := len(data.Manuais) + 1
 	novoId := 0
-	CriarNovoId(&novoId)
 	inputTitulo := c.PostForm("titulo")
 	inputConteudo := c.PostForm("conteudo")
 	inputSecao := c.PostForm("secao") 

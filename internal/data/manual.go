@@ -2,6 +2,7 @@ package data
 
 import (
 	"manual/internal/models"
+	"os"
 )
 
 // aqui ficam as funcoes sql
@@ -27,7 +28,7 @@ func InsertManual(manual models.Manual)(int64, error) {
 	return id, nil
 }
 func GetManuais()[]models.Manual{
-	query := "SELECT * FROM manuais"
+	query := "SELECT id, titulo, conteudo, secao FROM manuais"
 	var list []models.Manual
 	queryResult, err := DB.Query(query)
 	
@@ -46,21 +47,52 @@ func GetManuais()[]models.Manual{
 }
 
 func GetManualByID(id int) (models.Manual, error){
-	query := `SELECT * FROM manuais WHERE id = ?`
+	query := `SELECT id, titulo, conteudo, secao FROM manuais WHERE id = ?`
 	var result models.Manual
-	err := DB.QueryRow(query, id).Scan(&result.ID, &result.Titulo, &result.Conteudo, &result.Secao, &result.Arquivos)
+	err := DB.QueryRow(query, id).Scan(&result.ID, &result.Titulo, &result.Conteudo, &result.Secao)
 
 
-	if err == nil{
-		return result, nil
+	if err != nil{
+		return models.Manual{}, err
 	}
-	return models.Manual{}, err
+	queryAnexos := `SELECT * FROM anexos WHERE manual_id = ?`
+
+	rows, err := DB.Query(queryAnexos, id) // pega os arquivos
+
+	if err != nil{
+		return result, err
+	}
+	defer rows.Close()
+
+	for rows.Next(){
+		var a models.Anexo
+
+		err := rows.Scan(&a.ID, &a.Nome, &a.Tamanho_bytes, &a.Caminho, &a.Tipo_arquivo, &a.Manual_id)
+
+		if err != nil{
+			return result, err
+		}
+		result.Arquivos = append(result.Arquivos, a)
+	}
+
+	return result, nil
 }
 
 func DeleteManual(id int) error{
 	query := `DELETE FROM manuais WHERE id = ?`
+	
+	manual, err := GetManualByID(id)
+	if err != nil{
+		return err
+	}
+	for _, arquivo := range manual.Arquivos{
+		caminho := arquivo.Caminho
+		os.Remove(caminho)
+	}
+	queryDeleteAnexos := `DELETE FROM anexos WHERE manual_id = ?`
 
-	_, err := DB.Exec(query, id)
+	_, err = DB.Exec(queryDeleteAnexos, id) // primeiro o filho
+	_, err = DB.Exec(query, id) //depois o pai
 
 	
 	return err

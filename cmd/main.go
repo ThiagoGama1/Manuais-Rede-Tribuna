@@ -12,6 +12,7 @@ func main(){
 	data.LoadDatabase()
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
+	router.Static("/uploads", "./uploads")
 	router.GET("/", handler.ListarManuais)
 	router.GET("/manual/:id", handler.ExibirManualPorId)
 	router.GET("/novo", func(c *gin.Context) {

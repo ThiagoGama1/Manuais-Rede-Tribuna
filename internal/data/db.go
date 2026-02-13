@@ -20,7 +20,7 @@ func LoadDatabase(){
 
 	sqlCreateTable := `
 	CREATE TABLE IF NOT EXISTS manuais (
-	id INT NOT NULL PRIMARY KEY, 
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 	titulo TEXT,
 	conteudo TEXT,
 	secao TEXT,
@@ -31,10 +31,10 @@ func LoadDatabase(){
 	CREATE TABLE IF NOT EXISTS anexos(
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	nome TEXT,
-	tamanho INT,
+	tamanho INTEGER,
 	caminho TEXT,
 	tipo_arquivo TEXT,
-	manual_id INT,
+	manual_id INTEGER,
 	FOREIGN KEY(manual_id) REFERENCES manuais(id)
 	);`
 
