@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// aqui ficam as funcoes sql
 
 func InsertManual(manual models.Manual)(int64, error) {
 	stmt := "INSERT INTO manuais(titulo, conteudo, secao) VALUES(?, ?, ?)"
@@ -57,7 +56,7 @@ func GetManualByID(id int) (models.Manual, error){
 	}
 	queryAnexos := `SELECT * FROM anexos WHERE manual_id = ?`
 
-	rows, err := DB.Query(queryAnexos, id) // pega os arquivos
+	rows, err := DB.Query(queryAnexos, id)
 
 	if err != nil{
 		return result, err
@@ -91,8 +90,8 @@ func DeleteManual(id int) error{
 	}
 	queryDeleteAnexos := `DELETE FROM anexos WHERE manual_id = ?`
 
-	_, err = DB.Exec(queryDeleteAnexos, id) // primeiro o filho
-	_, err = DB.Exec(query, id) //depois o pai
+	_, err = DB.Exec(queryDeleteAnexos, id)
+	_, err = DB.Exec(query, id)
 
 	
 	return err
@@ -112,19 +111,25 @@ func UpdateManual(m models.Manual) error{
 	}
 	return nil
 }
-func DeleteAnexo(idAnexo int) bool{
-	query := `SELECT caminho FROM anexos WHERE anexo_id = ?`
+func DeleteAnexo(idAnexo int) error{
+	query := `SELECT caminho FROM anexos WHERE id = ?`
 	var caminho string
 	err := DB.QueryRow(query, idAnexo).Scan(&caminho)
 	if err != nil{
-		return false
+		return err
 	}
 	err = os.Remove(caminho)
 	if err != nil{
-		return false
+		return err
 	}
-	query2 := `DELETE FROM anexos WHERE anexo_id = ?`
+	query2 := `DELETE FROM anexos WHERE id = ?`
 
 	_, err = DB.Exec(query2, idAnexo)
-	return true
+
+	return err
+}
+func InsertAnexo(anexo models.Anexo) error{
+	query := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, manual_id) VALUES(?, ?, ?, ?, ?)"
+    _, err := DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Manual_id)
+    return err
 }

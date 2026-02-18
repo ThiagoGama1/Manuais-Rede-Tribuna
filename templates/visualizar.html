@@ -1,167 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>{{ .Titulo }} - Manual</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Titulo }} - Rede Tribuna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-    /* ESTILOS DOS ANEXOS */
-    .anexos-container {
-        margin-top: 40px;
-    }
-    .anexos-container h3 {
-        color: var(--text-main);
-        border-left: 4px solid var(--links);
-        padding-left: 10px;
-    }
-    .anexo-item {
-        background: white;
-        padding: 15px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-    }
-    .anexo-item a {
-        color: var(--links);
-        font-weight: bold;
-        text-decoration: none;
-    }
-    .anexo-item a:hover {
-        text-decoration: underline;
-    }
-    /* VARIÁVEIS DE CORES (A PALETA TRIBUNA) */
     :root {
-        --background-body: #f3f4f6; /* Fundo cinza moderno (não branco estourado) */
-        --background: #ffffff;      /* Fundo dos cartões */
-        --text-main: #1f2937;       /* Texto cinza escuro profissional */
-        --text-bright: #ffffff;     /* Texto dos botões */
-        --links: #b91c1c;           /* VERMELHO SANGUE (Cor de destaque) */
-        --focus: #ef4444;           /* Vermelho mais claro ao clicar */
-        --border: #e5e7eb;          /* Cor das bordas sutis */
-        --content-width: 900px;     /* Largura um pouco maior */
-        --button-hover: #991b1b;    /* Vermelho escuro ao passar o mouse */
+        --primary: #0f2b5b;
+        --primary-light: #1a4a8a;
+        --accent: #2563eb;
+        --bg-body: #f0f2f5;
+        --bg-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --shadow-md: 0 4px 12px rgba(15,43,91,0.1);
+        --shadow-lg: 0 12px 32px rgba(15,43,91,0.12);
+        --radius: 12px;
     }
-
-    /* CORPO DA PÁGINA (A "MESA" ONDE ESTÁ O PAPEL) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-        font-family: system-ui, -apple-system, sans-serif;
-        background-color: var(--background-body);
-        padding: 40px 20px;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        line-height: 1.7;
+        min-height: 100vh;
     }
 
-    /* O TÍTULO PRINCIPAL */
-    h1 {
-        color: #111;
-        border-bottom: 4px solid var(--links); /* Linha vermelha grossa embaixo */
-        display: inline-block;
-        padding-bottom: 10px;
-        margin-bottom: 40px;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
-
-    /* O LINK DE "CRIAR NOVA FUNÇÃO" */
-    a[href="/novo"] {
-        background-color: var(--links);
+    .header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(185, 28, 28, 0.3);
-        display: inline-block;
-        margin-bottom: 20px;
+        padding: 32px 40px;
+        position: relative;
+        overflow: hidden;
     }
-    a[href="/novo"]:hover {
-        background-color: var(--button-hover);
-        text-decoration: none;
-        transform: translateY(-2px);
+    .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+        border-radius: 50%;
     }
-
-    /* A LISTA DE MANUAIS (TIRA AS BOLINHAS FEIAS) */
-    ul {
-        list-style: none;
-        padding: 0;
+    .header-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
     }
-
-    /* CADA MANUAL É UM "CARD" AGORA */
-    li {
-        background: white;
-        border: 1px solid var(--border);
-        margin-bottom: 15px;
-        padding: 20px;
-        border-radius: 12px; /* Cantos arredondados */
-        display: flex;       /* Mágica: Título na esquerda, botões na direita */
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra leve */
-        transition: all 0.2s ease;
-    }
-
-    /* EFEITO AO PASSAR O MOUSE NO MANUAL */
-    li:hover {
-        transform: translateY(-3px); /* Sobe um pouquinho */
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Sombra aumenta */
-        border-left: 5px solid var(--links); /* Detalhe vermelho na esquerda */
-    }
-
-    /* O LINK DO TÍTULO DO MANUAL */
-    li a strong {
-        font-size: 1.1rem;
-        color: #374151;
-    }
-    
-    /* OS BOTÕES DE AÇÃO (EXCLUIR/EDITAR) */
-    form {
-        margin: 0; /* Remove margem padrão */
-    }
-    
-    button {
-        padding: 8px 16px;
+    .header .breadcrumb {
         font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: bold;
-        border-radius: 6px;
+        opacity: 0.7;
+        margin-bottom: 8px;
+    }
+    .header .breadcrumb a {
+        color: white;
+        text-decoration: none;
+        opacity: 0.85;
+    }
+    .header .breadcrumb a:hover { opacity: 1; text-decoration: underline; }
+    .header h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 30px auto 60px;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+    }
+    .content-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border);
+    }
+    .content-card .conteudo-texto {
+        font-size: 1rem;
+        color: var(--text-main);
+        line-height: 1.85;
+        white-space: pre-wrap;
+    }
+
+    .actions-bar {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+    }
+    .btn {
+        padding: 10px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         border: none;
         cursor: pointer;
-        transition: background 0.2s;
     }
+    .btn-voltar {
+        background: var(--bg-body);
+        color: var(--text-muted);
+    }
+    .btn-voltar:hover { background: #e2e8f0; color: var(--text-main); }
+    .btn-editar {
+        background: var(--warning-bg);
+        color: var(--warning);
+    }
+    .btn-editar:hover { background: #fef3c7; }
 
-    /* Botão Excluir (Deixar mais discreto ou agressivo?) */
-    button[style*="red"] {
-        background-color: #fee2e2 !important; /* Fundo vermelho bem clarinho */
-        color: #991b1b !important; /* Texto vermelho escuro */
+    .anexos-section {
+        margin-top: 36px;
     }
-    button[style*="red"]:hover {
-        background-color: #fecaca !important;
+    .anexos-section h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border);
     }
-
-    /* Botão Editar */
-    button[style*="chocolate"] {
-        background-color: #fff7ed !important; /* Laranja clarinho */
-        color: #9a3412 !important; /* Laranja escuro */
+    .anexo-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
     }
-</style>
+    .anexo-card:hover {
+        border-color: var(--accent);
+        background: #eff6ff;
+    }
+    .anexo-icon {
+        font-size: 1.4rem;
+    }
+    .anexo-card a {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .anexo-card a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-    <a href="/">Voltar</a>
-
-    <h1>{{ .Titulo }}</h1>
-    
-    <div class="conteudo">
-        <p>{{ .Conteudo }}</p>
-    </div>
-    {{ if .Arquivos }}
-    <div class="anexos-container">
-        <h3>📎 Anexos deste manual</h3>
-        {{ range .Arquivos }}
-            <div class="anexo-item">
-                <a href="/uploads/{{ .Nome }}" target="_blank">{{ .Nome }}</a>
+    <div class="header">
+        <div class="header-content">
+            <div class="breadcrumb">
+                <a href="/">📘 Base de Conhecimento</a> &rsaquo; Manual
             </div>
-        {{ end }}
+            <h1>{{ .Titulo }}</h1>
+        </div>
     </div>
-    {{ end }}
+
+    <div class="container">
+        <div class="content-card">
+            <div class="conteudo-texto">{{ .Conteudo }}</div>
+
+            {{ if .Arquivos }}
+            <div class="anexos-section">
+                <h3>📎 Anexos deste manual</h3>
+                {{ range .Arquivos }}
+                <div class="anexo-card">
+                    <span class="anexo-icon">📄</span>
+                    <a href="/uploads/{{ .Nome }}" target="_blank">{{ .Nome }}</a>
+                </div>
+                {{ end }}
+            </div>
+            {{ end }}
+
+            <div class="actions-bar">
+                <a href="/" class="btn btn-voltar">← Voltar</a>
+                <a href="/editar/{{ .ID }}" class="btn btn-editar">✏️ Editar</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

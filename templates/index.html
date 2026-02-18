@@ -1,252 +1,521 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Manuais Tribuna</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuais - Rede Tribuna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-    /* VARIÁVEIS DE CORES (A PALETA TRIBUNA) */
     :root {
-        --background-body: #f3f4f6;
-        --background: #ffffff;
-        --text-main: #1f2937;
+        --primary: #0f2b5b;
+        --primary-light: #1a4a8a;
+        --primary-hover: #0a1f42;
+        --primary-glow: rgba(15, 43, 91, 0.25);
+        --accent: #2563eb;
+        --accent-light: #3b82f6;
+        --bg-body: #f0f2f5;
+        --bg-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
         --text-bright: #ffffff;
-        --links: #b91c1c;
-        --focus: #ef4444;
-        --border: #e5e7eb;
-        --content-width: 900px;
-        --button-hover: #991b1b;
+        --border: #e2e8f0;
+        --border-hover: #cbd5e1;
+        --success: #059669;
+        --success-bg: #ecfdf5;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --shadow-sm: 0 1px 3px rgba(15,43,91,0.08);
+        --shadow-md: 0 4px 12px rgba(15,43,91,0.1);
+        --shadow-lg: 0 12px 32px rgba(15,43,91,0.15);
+        --radius: 12px;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-        font-family: system-ui, -apple-system, sans-serif;
-        background-color: var(--background-body);
-        padding: 40px 20px;
-    }
-
-    h1 {
-        color: #111;
-        border-bottom: 4px solid var(--links);
-        display: inline-block;
-        padding-bottom: 10px;
-        margin-bottom: 40px;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
-
-    /* ESTILO NOVO: TÍTULOS DAS SEÇÕES */
-    h2 {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background-color: var(--bg-body);
         color: var(--text-main);
-        margin-top: 50px;
-        margin-bottom: 20px;
-        font-size: 1.5rem;
-        border-left: 5px solid var(--links);
-        padding-left: 15px;
-        background: rgba(0,0,0,0.03);
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-radius: 0 8px 8px 0;
+        line-height: 1.6;
     }
 
-    a[href="/novo"] {
-        background-color: var(--links);
+    .header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(185, 28, 28, 0.3);
-        display: inline-block;
-        margin-bottom: 20px;
+        padding: 48px 40px 40px;
+        position: relative;
+        overflow: hidden;
     }
-    a[href="/novo"]:hover {
-        background-color: var(--button-hover);
+    .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .header-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    .header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+    }
+    .header p {
+        font-size: 1rem;
+        opacity: 0.8;
+        font-weight: 400;
+    }
+    .header-actions {
+        margin-top: 24px;
+    }
+    .btn-criar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
         text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: 1px solid rgba(255,255,255,0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-criar:hover {
+        background: rgba(255,255,255,0.25);
         transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    ul {
+    .toast {
+        max-width: 1000px;
+        margin: 20px auto 0;
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideDown 0.4s ease-out, fadeOut 0.5s ease 4.5s forwards;
+    }
+    .toast-success {
+        background: var(--success-bg);
+        color: var(--success);
+        border: 1px solid #a7f3d0;
+    }
+    .toast-danger {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid #fecaca;
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+        to { opacity: 0; transform: translateY(-10px); pointer-events: none; }
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 30px 40px 60px;
+    }
+
+    .secao-titulo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 40px;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border);
+    }
+    .secao-titulo:first-child { margin-top: 0; }
+    .secao-titulo .icone {
+        font-size: 1.3rem;
+    }
+    .secao-titulo h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    .secao-titulo .badge-count {
+        margin-left: auto;
+        background: var(--bg-body);
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .manual-list {
         list-style: none;
         padding: 0;
+        margin: 0;
     }
-
-    li {
-        background: white;
+    .manual-card {
+        background: var(--bg-card);
         border: 1px solid var(--border);
-        margin-bottom: 15px;
-        padding: 20px;
-        border-radius: 12px;
+        border-radius: var(--radius);
+        padding: 18px 22px;
+        margin-bottom: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.25s ease;
+        border-left: 4px solid transparent;
+    }
+    .manual-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-left-color: var(--accent);
+    }
+    .manual-card a {
+        text-decoration: none;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 1rem;
+        flex: 1;
+        transition: color 0.2s;
+    }
+    .manual-card a:hover {
+        color: var(--accent);
+    }
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
     }
 
-    li:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        border-left: 5px solid var(--links);
-    }
-
-    li a strong {
-        font-size: 1.1rem;
-        color: #374151;
-    }
-    
-    form { margin: 0; }
-    
-    button {
-        padding: 8px 16px;
-        font-size: 0.85rem;
+    .btn {
+        padding: 7px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: bold;
-        border-radius: 6px;
+        letter-spacing: 0.4px;
+        border-radius: 8px;
         border: none;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .btn-ver {
+        background: #eff6ff;
+        color: var(--accent);
+    }
+    .btn-ver:hover { background: #dbeafe; }
+    .btn-editar {
+        background: var(--warning-bg);
+        color: var(--warning);
+    }
+    .btn-editar:hover { background: #fef3c7; }
+    .btn-excluir {
+        background: var(--danger-bg);
+        color: var(--danger);
+    }
+    .btn-excluir:hover { background: #fecaca; }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 43, 91, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .modal h3 {
+        font-size: 1.15rem;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+    .modal p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+    .modal-btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .modal-btn-cancel {
+        background: var(--bg-body);
+        color: var(--text-muted);
+    }
+    .modal-btn-cancel:hover { background: #e2e8f0; }
+    .modal-btn-danger {
+        background: var(--danger);
+        color: white;
+    }
+    .modal-btn-danger:hover { background: #b91c1c; }
+
+    .search-bar {
+        margin-bottom: 10px;
+        position: relative;
+    }
+    .search-bar input {
+        width: 100%;
+        padding: 12px 18px 12px 44px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg-card);
+        color: var(--text-main);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-bar input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .search-bar input::placeholder {
+        color: var(--text-muted);
+    }
+    .search-bar .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        color: var(--text-muted);
     }
 
-    button[style*="red"] {
-        background-color: #fee2e2 !important;
-        color: #991b1b !important;
-    }
-    button[style*="red"]:hover {
-        background-color: #fecaca !important;
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
     }
 
-    button[style*="chocolate"] {
-        background-color: #fff7ed !important;
-        color: #9a3412 !important;
-    }
-    
-    /* ETIQUETA PEQUENA PARA IDENTIFICAR SEÇÃO NO CARD (OPCIONAL) */
-    .tag-secao {
-        font-size: 0.7rem;
-        background: #eee;
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: #666;
-        margin-left: 10px;
-        text-transform: uppercase;
-    }
+    html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
-    <a href="/novo"> + Criar Nova Função</a>
-    <hr>
-
-    <h1>Base de Conhecimento Rede Tribuna</h1>
-
-    <h2>📺 TV Tribuna</h2>
-    <ul>
-        {{ range .Manuais }}
-            {{ if eq .Secao "TV" }}
-            <li>
-                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
-                <div>
-                    <a href="/manual/{{ .ID }}" style="margin-left: 10px;">
-                    <button type="button" style="color: #0369a1; background-color: #e0f2fe;">Ver</button>
+    <div class="header">
+        <div class="header-content">
+            <h1>📘 Base de Conhecimento</h1>
+            <p>Rede Tribuna — Manuais e procedimentos internos</p>
+            <div class="header-actions">
+                <a href="/novo" class="btn-criar">
+                    <span>＋</span> Criar Nova Função
                 </a>
-                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
-                        <button type="submit" style="color: chocolate;">Editar</button>
-                    </form>
-                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
-                        <button type="submit" style="color: red;">Excluir</button>
-                    </form>
-                </div>
-            </li>
-            {{ end }}
-        {{ end }}
-    </ul>
+            </div>
+        </div>
+    </div>
 
-    <h2>📻 Rádios</h2>
-    <ul>
-        {{ range .Manuais }}
-            {{ if eq .Secao "Rádio" }}
-            <li>
-                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
-                <div>
-                    <a href="/manual/{{ .ID }}" style="margin-left: 10px;">
-                    <button type="button" style="color: #0369a1; background-color: #e0f2fe;">Ver</button>
-                </a>
-                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
-                        <button type="submit" style="color: chocolate;">Editar</button>
-                    </form>
-                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
-                        <button type="submit" style="color: red;">Excluir</button>
-                    </form>
-                </div>
-            </li>
-            {{ end }}
-        {{ end }}
-    </ul>
+    {{ if eq .Msg "criado" }}
+    <div class="toast toast-success">✅ Manual criado com sucesso!</div>
+    {{ end }}
+    {{ if eq .Msg "deletado" }}
+    <div class="toast toast-danger">🗑️ Manual excluído com sucesso.</div>
+    {{ end }}
+    {{ if eq .Msg "atualizado" }}
+    <div class="toast toast-success">✏️ Manual atualizado com sucesso!</div>
+    {{ end }}
 
-    <h2>📰 Jornal</h2>
-    <ul>
-        {{ range .Manuais }}
-            {{ if eq .Secao "Jornal" }}
-            <li>
-                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
-                <div>
-                    <a href="/manual/{{ .ID }}" style="margin-left: 10px;">
-                    <button type="button" style="color: #0369a1; background-color: #e0f2fe;">Ver</button>
-                </a>
-                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
-                        <button type="submit" style="color: chocolate;">Editar</button>
-                    </form>
-                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
-                        <button type="submit" style="color: red;">Excluir</button>
-                    </form>
-                </div>
-            </li>
-            {{ end }}
-        {{ end }}
-    </ul>
+    <div class="container">
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Pesquisar manuais..." oninput="filtrarManuais()">
+        </div>
 
-    <h2>💻 Tribuna Online</h2>
-    <ul>
-        {{ range .Manuais }}
-            {{ if eq .Secao "Online" }}
-            <li>
-                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> </a>
-                <div>
-                    <a href="/manual/{{ .ID }}" style="margin-left: 10px;">
-                    <button type="button" style="color: #0369a1; background-color: #e0f2fe;">Ver</button>
-                </a>
-                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
-                        <button type="submit" style="color: chocolate;">Editar</button>
-                    </form>
-                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
-                        <button type="submit" style="color: red;">Excluir</button>
-                    </form>
-                </div>
-            </li>
+        <div class="secao-titulo">
+            <span class="icone">📺</span>
+            <h2>TV Tribuna</h2>
+        </div>
+        <ul class="manual-list" data-secao="tv">
+            {{ range .Manuais }}
+                {{ if eq .Secao "TV" }}
+                <li class="manual-card" data-titulo="{{ .Titulo }}">
+                    <a href="/manual/{{ .ID }}"><strong>{{ .Titulo }}</strong></a>
+                    <div class="card-actions">
+                        <a href="/manual/{{ .ID }}" class="btn btn-ver">Ver</a>
+                        <a href="/editar/{{ .ID }}" class="btn btn-editar">Editar</a>
+                        <button type="button" class="btn btn-excluir" onclick="confirmarExclusao({{ .ID }}, '{{ .Titulo }}')">Excluir</button>
+                    </div>
+                </li>
+                {{ end }}
             {{ end }}
-        {{ end }}
-    </ul>
-    
-    <h2>📂 Geral / Outros</h2>
-    <ul>
-        {{ range .Manuais }}
-            {{ if eq .Secao "" }}
-            <li>
-                <a href="/manual/{{ .ID }}"> <strong>{{ .Titulo }}</strong> <span class="tag-secao">Sem categoria</span></a>
-                <div>
-                    <a href="/manual/{{ .ID }}" style="margin-left: 10px;">
-                    <button type="button" style="color: #0369a1; background-color: #e0f2fe;">Ver</button>
-                </a>
-                    <form method="GET" action="/editar/{{ .ID }}" style="display:inline; margin-left: 10px;">
-                        <button type="submit" style="color: chocolate;">Editar</button>
-                    </form>
-                    <form method="POST" action="/deletar/{{ .ID }}" style="display:inline; margin-left: 5px;">
-                        <button type="submit" style="color: red;">Excluir</button>
-                    </form>
-                </div>
-            </li>
-            {{ end }}
-        {{ end }}
-    </ul>
+        </ul>
 
+        <div class="secao-titulo">
+            <span class="icone">📻</span>
+            <h2>Rádios</h2>
+        </div>
+        <ul class="manual-list" data-secao="radio">
+            {{ range .Manuais }}
+                {{ if eq .Secao "Rádio" }}
+                <li class="manual-card" data-titulo="{{ .Titulo }}">
+                    <a href="/manual/{{ .ID }}"><strong>{{ .Titulo }}</strong></a>
+                    <div class="card-actions">
+                        <a href="/manual/{{ .ID }}" class="btn btn-ver">Ver</a>
+                        <a href="/editar/{{ .ID }}" class="btn btn-editar">Editar</a>
+                        <button type="button" class="btn btn-excluir" onclick="confirmarExclusao({{ .ID }}, '{{ .Titulo }}')">Excluir</button>
+                    </div>
+                </li>
+                {{ end }}
+            {{ end }}
+        </ul>
+
+        <div class="secao-titulo">
+            <span class="icone">📰</span>
+            <h2>Jornal</h2>
+        </div>
+        <ul class="manual-list" data-secao="jornal">
+            {{ range .Manuais }}
+                {{ if eq .Secao "Jornal" }}
+                <li class="manual-card" data-titulo="{{ .Titulo }}">
+                    <a href="/manual/{{ .ID }}"><strong>{{ .Titulo }}</strong></a>
+                    <div class="card-actions">
+                        <a href="/manual/{{ .ID }}" class="btn btn-ver">Ver</a>
+                        <a href="/editar/{{ .ID }}" class="btn btn-editar">Editar</a>
+                        <button type="button" class="btn btn-excluir" onclick="confirmarExclusao({{ .ID }}, '{{ .Titulo }}')">Excluir</button>
+                    </div>
+                </li>
+                {{ end }}
+            {{ end }}
+        </ul>
+
+        <div class="secao-titulo">
+            <span class="icone">💻</span>
+            <h2>Tribuna Online</h2>
+        </div>
+        <ul class="manual-list" data-secao="online">
+            {{ range .Manuais }}
+                {{ if eq .Secao "Online" }}
+                <li class="manual-card" data-titulo="{{ .Titulo }}">
+                    <a href="/manual/{{ .ID }}"><strong>{{ .Titulo }}</strong></a>
+                    <div class="card-actions">
+                        <a href="/manual/{{ .ID }}" class="btn btn-ver">Ver</a>
+                        <a href="/editar/{{ .ID }}" class="btn btn-editar">Editar</a>
+                        <button type="button" class="btn btn-excluir" onclick="confirmarExclusao({{ .ID }}, '{{ .Titulo }}')">Excluir</button>
+                    </div>
+                </li>
+                {{ end }}
+            {{ end }}
+        </ul>
+
+        <div class="secao-titulo">
+            <span class="icone">📂</span>
+            <h2>Geral / Outros</h2>
+        </div>
+        <ul class="manual-list" data-secao="geral">
+            {{ range .Manuais }}
+                {{ if eq .Secao "" }}
+                <li class="manual-card" data-titulo="{{ .Titulo }}">
+                    <a href="/manual/{{ .ID }}"><strong>{{ .Titulo }}</strong> <span style="font-size:0.7rem;background:var(--bg-body);padding:2px 8px;border-radius:12px;color:var(--text-muted);margin-left:8px;font-weight:500;">Sem categoria</span></a>
+                    <div class="card-actions">
+                        <a href="/manual/{{ .ID }}" class="btn btn-ver">Ver</a>
+                        <a href="/editar/{{ .ID }}" class="btn btn-editar">Editar</a>
+                        <button type="button" class="btn btn-excluir" onclick="confirmarExclusao({{ .ID }}, '{{ .Titulo }}')">Excluir</button>
+                    </div>
+                </li>
+                {{ end }}
+            {{ end }}
+        </ul>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3>🗑️ Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir o manual <strong id="modalTitulo"></strong>? Esta ação não pode ser desfeita.</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <form id="formDeletar" method="POST" style="margin:0;">
+                    <button type="submit" class="modal-btn modal-btn-danger">Sim, Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ── Modal de exclusão ──
+    function confirmarExclusao(id, titulo) {
+        document.getElementById('modalTitulo').textContent = '"' + titulo + '"';
+        document.getElementById('formDeletar').action = '/deletar/' + id;
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+    function fecharModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
+
+    // ── Pesquisa client-side ──
+    function filtrarManuais() {
+        var termo = document.getElementById('searchInput').value.toLowerCase();
+        var cards = document.querySelectorAll('.manual-card');
+        cards.forEach(function(card) {
+            var titulo = card.getAttribute('data-titulo').toLowerCase();
+            card.style.display = titulo.includes(termo) ? '' : 'none';
+        });
+    }
+
+    // ── Auto-dismiss toast ──
+    setTimeout(function() {
+        var toast = document.querySelector('.toast');
+        if (toast) toast.style.display = 'none';
+    }, 5500);
+    </script>
 </body>
 </html>

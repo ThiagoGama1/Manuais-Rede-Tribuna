@@ -12,7 +12,8 @@ import (
 )
 
 func ListarManuais(c *gin.Context){
-	c.HTML(http.StatusOK, "index.html", gin.H{"Manuais": data.GetManuais()})
+	msg := c.Query("msg")
+	c.HTML(http.StatusOK, "index.html", gin.H{"Manuais": data.GetManuais(), "Msg": msg})
 }
 
 func ExibirManualPorId(c *gin.Context){
@@ -33,7 +34,6 @@ func ExibirManualPorId(c *gin.Context){
 }
 
 func CriarManual(c *gin.Context){
-	//novoId := len(data.Manuais) + 1
 	novoId := 0
 	inputTitulo := c.PostForm("titulo")
 	inputConteudo := c.PostForm("conteudo")
@@ -69,7 +69,7 @@ func CriarManual(c *gin.Context){
 	
 	novoManual = models.Manual{ID: novoId, Titulo: inputTitulo, Conteudo: inputConteudo, Secao: inputSecao, Arquivos: listaAnexos}
 	data.InsertManual(novoManual)
-	c.Redirect(http.StatusSeeOther, "/")
+	c.Redirect(http.StatusSeeOther, "/?msg=criado")
 }
 
 func DeleteManualById(c *gin.Context){
@@ -87,7 +87,7 @@ func DeleteManualById(c *gin.Context){
 		c.Redirect(http.StatusSeeOther, "/")
 		return
 	}
-	c.Redirect(http.StatusFound, "/")
+	c.Redirect(http.StatusFound, "/?msg=deletado")
 }
 
 func UpdateManualById(c *gin.Context){
@@ -108,7 +108,7 @@ func UpdateManualById(c *gin.Context){
 	c.HTML(http.StatusOK, "editar.html", copiaManual)
 	
 }
-func RecebeUpdateById(c * gin.Context){
+func RecebeUpdateById(c *gin.Context){
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 
@@ -121,17 +121,64 @@ func RecebeUpdateById(c * gin.Context){
 	inputTitulo := c.PostForm("titulo")
 	inputConteudo := c.PostForm("conteudo")
 	inputSecao := c.PostForm("secao")
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	if strings.TrimSpace(inputTitulo) == "" || strings.TrimSpace(inputConteudo) == "" || strings.TrimSpace(inputSecao) == ""{
+		c.Redirect(http.StatusFound, "/novo")
+		return
+	}
+	
 
+	for _, arquivo := range form.File["arquivos"]{
+		destino := "./uploads/" + arquivo.Filename
+		
+		if err := c.SaveUploadedFile(arquivo, destino); err != nil{
+			log.Println("Erro ao salvar o anexo:", err)
+			continue
+		}
+		novoAnexo := models.Anexo{
+            Nome:          arquivo.Filename,
+            Tamanho_bytes: int(arquivo.Size),
+            Caminho:       destino,
+            Tipo_arquivo:  arquivo.Header.Get("Content-Type"),
+            Manual_id:     id, 
+	}
+		err := data.InsertAnexo(novoAnexo)
+        if err != nil {
+            log.Println("Erro ao inserir anexo no banco:", err)
+        }
+	}
 	copiaManual.ID = id
 	copiaManual.Titulo = inputTitulo
 	copiaManual.Conteudo = inputConteudo
 	copiaManual.Secao = inputSecao
-
+	
 	err = data.UpdateManual(copiaManual)
 	if err != nil {
-        log.Println("Erro ao atualizar manual:", err) // <--- O Dedo-Duro
+        log.Println("Erro ao atualizar manual:", err) 
         c.Redirect(http.StatusSeeOther, "/")
         return
     }
-	c.Redirect(http.StatusSeeOther, "/")
+	c.Redirect(http.StatusSeeOther, "/?msg=atualizado")
+	}
+
+
+func DeleteAnexoHandler(c *gin.Context){
+	idAnexo := c.Param("id")
+	id, err := strconv.Atoi(idAnexo)
+
+	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"mensagem": "erro ao converter id"})
+		return
+	}
+	err = data.DeleteAnexo(id)
+
+	if err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"mensagem": "erro ao chamar a funcao na data"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"output": "Deletado com sucesso!"})
 }

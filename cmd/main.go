@@ -22,6 +22,6 @@ func main(){
 	router.POST("/deletar/:id", handler.DeleteManualById)
 	router.GET("/editar/:id", handler.UpdateManualById)
 	router.POST("/atualizar/:id", handler.RecebeUpdateById)
-
-	router.Run()
+	router.POST("/deletar-anexo/:id", handler.DeleteAnexoHandler)
+	router.Run(":3609")
 }
