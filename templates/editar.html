@@ -192,10 +192,48 @@
 
         <label>Passo a Passo (Conteúdo):</label><br>
         <textarea name="conteudo" rows="5" cols="40" required>{{ .Conteudo }}</textarea><br><br>
+        {{ if .Arquivos }}
+        <label>Arquivos Atuais:</label>
+        <ul style="margin-top: 5px; margin-bottom: 20px;">
+            {{ range .Arquivos }}
+                <li style="display: flex; justify-content: space-between; padding: 10px; border: 1px solid #eee; margin-bottom: 5px;">
+                    <span>📄 {{ .Nome }}</span>
+                    
+                    <button type="button" 
+                            onclick="deletarArquivo({{ .ID }}, this)"
+                            style="background-color: #fee2e2; color: #991b1b; padding: 4px 8px; font-size: 0.8rem;">
+                        Remover
+                    </button>
+                </li>
+            {{ end }}
+        </ul>
+        {{ end }}
 
+        <label>Adicionar Novos Anexos:</label><br>
+        <input type="file" name="arquivos" multiple><br><br>
         <button type="submit">Salvar Alterações</button>
     </form>
     
     <a href="/">Cancelar</a>
+    <script>
+        function deletarArquivo(idAnexo, botao) {
+            if(!confirm("Tem certeza que deseja remover este anexo permanentemente?")) return;
+
+            // Envia o pedido para o nosso servidor Go
+            fetch('/deletar-anexo/' + idAnexo, {
+                method: 'POST'
+            })
+            .then(response => {
+                if(response.ok) {
+                    // Se o servidor disse "OK", removemos a linha da tela
+                    var itemLista = botao.parentElement;
+                    itemLista.remove();
+                } else {
+                    alert("Houve um erro ao tentar excluir o anexo.");
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
 </body>
 </html>

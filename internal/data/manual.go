@@ -112,3 +112,19 @@ func UpdateManual(m models.Manual) error{
 	}
 	return nil
 }
+func DeleteAnexo(idAnexo int) bool{
+	query := `SELECT caminho FROM anexos WHERE anexo_id = ?`
+	var caminho string
+	err := DB.QueryRow(query, idAnexo).Scan(&caminho)
+	if err != nil{
+		return false
+	}
+	err = os.Remove(caminho)
+	if err != nil{
+		return false
+	}
+	query2 := `DELETE FROM anexos WHERE anexo_id = ?`
+
+	_, err = DB.Exec(query2, idAnexo)
+	return true
+}
