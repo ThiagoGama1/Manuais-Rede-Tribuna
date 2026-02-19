@@ -19,10 +19,8 @@ func InsertManual(manual models.Manual)(int64, error) {
 		return 0, err
 	}
 	for _, anexo := range manual.Arquivos{
-		stmtAnexos := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, manual_id) VALUES(?, ?, ?, ?, ?)"
-		
-		_, err = DB.Exec(stmtAnexos, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, id)
-		
+		anexo.Manual_id = int(id)
+		InsertAnexo(anexo)
 	}
 	return id, nil
 }
@@ -54,7 +52,8 @@ func GetManualByID(id int) (models.Manual, error){
 	if err != nil{
 		return models.Manual{}, err
 	}
-	queryAnexos := `SELECT * FROM anexos WHERE manual_id = ?`
+	queryAnexos := `SELECT id, nome, tamanho, caminho, tipo_arquivo, manual_id, ordem_apresentacao 
+	FROM anexos WHERE manual_id = ? ORDER BY ordem_apresentacao ASC`
 
 	rows, err := DB.Query(queryAnexos, id)
 
@@ -66,7 +65,7 @@ func GetManualByID(id int) (models.Manual, error){
 	for rows.Next(){
 		var a models.Anexo
 
-		err := rows.Scan(&a.ID, &a.Nome, &a.Tamanho_bytes, &a.Caminho, &a.Tipo_arquivo, &a.Manual_id)
+		err := rows.Scan(&a.ID, &a.Nome, &a.Tamanho_bytes, &a.Caminho, &a.Tipo_arquivo, &a.Manual_id, &a.OrdemApresentacao)
 
 		if err != nil{
 			return result, err
@@ -129,7 +128,18 @@ func DeleteAnexo(idAnexo int) error{
 	return err
 }
 func InsertAnexo(anexo models.Anexo) error{
-	query := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, manual_id) VALUES(?, ?, ?, ?, ?)"
-    _, err := DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Manual_id)
+	//preciso descobrir o maior numero da ordem
+	var maiorOrdem int
+	queryMaiorNumero := `SELECT COALESCE(MAX(ordem_apresentacao), 0) FROM anexos WHERE manual_id = ?`
+
+	err := DB.QueryRow(queryMaiorNumero, anexo.Manual_id).Scan(&maiorOrdem)
+	if err != nil{
+		return err
+	}
+	var proxOrdem = maiorOrdem + 1
+
+
+	query := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, manual_id, ordem_apresentacao) VALUES(?, ?, ?, ?, ?, ?)"
+    _, err = DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Manual_id, proxOrdem)
     return err
 }

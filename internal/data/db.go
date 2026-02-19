@@ -35,6 +35,7 @@ func LoadDatabase(){
 	caminho TEXT,
 	tipo_arquivo TEXT,
 	manual_id INTEGER,
+	ordem_apresentacao INTEGER NOT NULL,
 	FOREIGN KEY(manual_id) REFERENCES manuais(id)
 	);`
 
