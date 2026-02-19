@@ -182,3 +182,23 @@ func DeleteAnexoHandler(c *gin.Context){
 	}
 	c.JSON(http.StatusOK, gin.H{"output": "Deletado com sucesso!"})
 }
+
+func ReordenarAnexo(c *gin.Context){
+	idAnexo := c.Param("id")
+	direcao := c.Param("direcao")
+
+	id, err := strconv.Atoi(idAnexo)
+	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"mensagem": "erro ao converter id"})
+		return
+	}
+
+	err = data.ReordenarAnexoData(id, direcao)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"mensagem": "erro ao chamar a funcao na data"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"output":"Reordenado!"})
+	
+}

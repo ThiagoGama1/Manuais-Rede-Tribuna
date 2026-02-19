@@ -143,3 +143,77 @@ func InsertAnexo(anexo models.Anexo) error{
     _, err = DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Manual_id, proxOrdem)
     return err
 }
+func ReordenarAnexoData(idAnexo int, direcao string) error{
+	var ordemAtual int
+	var manualId int
+
+	queryAnexoAtual := `SELECT ordem_apresentacao, manual_id FROM anexos WHERE id = ?`
+	err := DB.QueryRow(queryAnexoAtual, idAnexo).Scan(&ordemAtual, &manualId)
+	if err != nil{
+		return err
+	}
+	if direcao == "subir"{
+		var ordemProx int
+		var proxAnexoID int
+
+		queryProxAnexo := `SELECT ordem_apresentacao, id FROM anexos WHERE manual_id = ? AND ordem_apresentacao < ?
+		ORDER BY ordem_apresentacao DESC LIMIT 1`
+		
+		err = DB.QueryRow(queryProxAnexo, manualId, ordemAtual).Scan(&ordemProx, &proxAnexoID)
+
+		queryUpdateAnexoAtual := `UPDATE anexos
+		SET ordem_apresentacao = ?
+		WHERE id = ?`
+
+		_, err = DB.Exec(queryUpdateAnexoAtual, ordemProx, idAnexo)
+
+		if err != nil{
+			return err
+		}
+		queryUpdateProxAnexo := `UPDATE anexos
+		SET ordem_apresentacao = ?
+		WHERE id = ?`
+
+		_, err = DB.Exec(queryUpdateProxAnexo, ordemAtual, proxAnexoID)
+
+		if err != nil{
+			return err
+		}
+		return nil
+	}
+
+	if direcao == "descer"{
+		var ordemAnterior int
+		var anexoAnteriorID int
+
+		queryAnexoAnterior := `SELECT ordem_apresentacao, id FROM anexos WHERE manual_id = ? AND ordem_apresentacao > ?
+		ORDER BY ordem_apresentacao ASC LIMIT 1`
+
+		err = DB.QueryRow(queryAnexoAnterior, manualId, ordemAtual).Scan(&ordemAnterior, &anexoAnteriorID)
+		if err != nil{
+			return err
+		}
+		queryUpdateAnexoAtual := `UPDATE anexos
+		SET ordem_apresentacao = ?
+		WHERE id = ?`
+
+		_, err = DB.Exec(queryUpdateAnexoAtual, ordemAnterior, idAnexo)
+
+		if err != nil{
+			return err
+		}
+		queryUpdateAnexoAnterior := `UPDATE anexos
+		SET ordem_apresentacao = ?
+		WHERE id = ?`
+
+		_, err = DB.Exec(queryUpdateAnexoAnterior, ordemAtual, anexoAnteriorID)
+
+		if err != nil{
+			return err
+		}
+		
+		
+	}
+
+	return nil
+} 

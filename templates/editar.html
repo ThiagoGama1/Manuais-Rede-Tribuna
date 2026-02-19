@@ -170,6 +170,41 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .anexo-acoes {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .btn-ordem {
+        background: #eff6ff;
+        color: var(--accent);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-ordem:hover {
+        background: #dbeafe;
+        transform: scale(1.1);
+    }
+    .btn-ordem:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        transform: none;
     }
     .btn-remover {
         background: var(--danger-bg);
@@ -184,6 +219,7 @@
         transition: all 0.2s;
         text-transform: uppercase;
         letter-spacing: 0.3px;
+        margin-left: 6px;
     }
     .btn-remover:hover {
         background: #fecaca;
@@ -267,7 +303,11 @@
                     {{ range .Arquivos }}
                     <div class="anexo-item" id="anexo-{{ .ID }}">
                         <span class="anexo-nome">📄 {{ .Nome }}</span>
-                        <button type="button" class="btn-remover" onclick="deletarArquivo({{ .ID }})">Remover</button>
+                        <div class="anexo-acoes">
+                            <button type="button" class="btn-ordem" title="Subir" onclick="reordenarAnexo({{ .ID }}, 'subir')">▲</button>
+                            <button type="button" class="btn-ordem" title="Descer" onclick="reordenarAnexo({{ .ID }}, 'descer')">▼</button>
+                            <button type="button" class="btn-remover" onclick="deletarArquivo({{ .ID }})">Remover</button>
+                        </div>
                     </div>
                     {{ end }}
                 </div>
@@ -298,6 +338,18 @@
                 setTimeout(function() { item.remove(); }, 350);
             } else {
                 alert("Erro ao excluir o anexo.");
+            }
+        })
+        .catch(function(error) { console.error('Erro:', error); });
+    }
+
+    function reordenarAnexo(idAnexo, direcao) {
+        fetch('/reordenar-anexo/' + idAnexo + '/' + direcao, { method: 'POST' })
+        .then(function(response) {
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Erro ao reordenar o anexo.');
             }
         })
         .catch(function(error) { console.error('Erro:', error); });
