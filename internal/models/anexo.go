@@ -6,6 +6,6 @@ type Anexo struct {
 	Tamanho_bytes     int    `json:"tamanho"`
 	Caminho           string `json:"caminho"`
 	Tipo_arquivo      string `json:"tipo_arquivo"`
-	Manual_id         int    `json:"idmanual"`
+	Etapa_id          int    `json:"etapa_id"`
 	OrdemApresentacao int    `json:"ordem_apresentacao"`
 }

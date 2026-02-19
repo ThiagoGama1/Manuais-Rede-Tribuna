@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"manual/internal/data"
 	"manual/internal/models"
@@ -39,6 +40,27 @@ func CriarManual(c *gin.Context){
 	inputConteudo := c.PostForm("conteudo")
 	inputSecao := c.PostForm("secao") 
 	form, err := c.MultipartForm()
+	totalStr := c.PostForm("total_etapas")
+	totalEtapas, err := strconv.Atoi(totalStr)
+	if err != nil{
+		c.Redirect(http.StatusBadRequest, "/")
+		return
+	}
+	var listaEtapas []models.Etapa
+
+	for i := 1; i <= totalEtapas; i++{
+		nomeCampoTexto := fmt.Sprintf("conteudo_etapa_%d", i)
+		conteudoTexto := c.PostForm(nomeCampoTexto)
+
+		nomeCampoArquivos := fmt.Sprintf("arquivos_etapa_%d", i)
+		arquivos := form.File[nomeCampoArquivos]
+
+		var novaEtapa models.Etapa
+		novaEtapa.Conteudo = conteudoTexto
+		novaEtapa.Ordem_apresentacao = i
+		// parei aqui
+	}
+	
 	var novoManual models.Manual
 	if err != nil {
 		c.Redirect(http.StatusSeeOther, "/")

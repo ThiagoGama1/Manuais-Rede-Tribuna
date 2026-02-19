@@ -201,10 +201,27 @@
                     <input type="text" name="titulo" placeholder="Ex: Como publicar matéria no site" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Passo a Passo (Conteúdo) <span class="required">*</span></label>
-                    <textarea name="conteudo" rows="6" placeholder="Descreva o procedimento passo a passo..." required></textarea>
-                </div>
+                <input type="hidden" name="total_etapas" id="total_etapas" value="1">
+    
+    <div id="etapas-container">
+        <div class="etapa-box" id="etapa_1" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+            <h4>Passo 1</h4>
+            
+            <div class="form-group">
+                <label for="conteudo_etapa_1">Instruções do Passo:</label>
+                <textarea class="form-control" name="conteudo_etapa_1" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="arquivos_etapa_1">Anexos deste Passo (Opcional):</label>
+                <input type="file" class="form-control" name="arquivos_etapa_1" multiple>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" onclick="adicionarEtapa()" style="margin-bottom: 20px; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        + Adicionar Novo Passo
+    </button>
 
                 <div class="form-group">
                     <label>Anexos (PDF, Imagens, Vídeos)</label>
@@ -218,5 +235,51 @@
             </form>
         </div>
     </div>
+    <script>
+    // Começamos sempre com 1 etapa na tela
+    let contadorEtapas = 1;
+
+    function adicionarEtapa() {
+        contadorEtapas++;
+        
+        // Atualiza o número total de etapas no campo oculto para o Go saber
+        document.getElementById('total_etapas').value = contadorEtapas;
+
+        const container = document.getElementById('etapas-container');
+        const novaEtapa = document.createElement('div');
+        
+        novaEtapa.className = 'etapa-box';
+        novaEtapa.id = 'etapa_' + contadorEtapas;
+        novaEtapa.style = 'border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px;';
+
+        // Desenha os campos com os nomes numerados (ex: conteudo_etapa_2, arquivos_etapa_2)
+        novaEtapa.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4>Passo ${contadorEtapas}</h4>
+                <button type="button" onclick="removerEtapa(${contadorEtapas})" style="color: red; border: none; background: none; cursor: pointer;">Remover</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Instruções do Passo:</label>
+                <textarea class="form-control" name="conteudo_etapa_${contadorEtapas}" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Anexos deste Passo (Opcional):</label>
+                <input type="file" class="form-control" name="arquivos_etapa_${contadorEtapas}" multiple>
+            </div>
+        `;
+        
+        container.appendChild(novaEtapa);
+    }
+
+    // Função bônus para caso o usuário adicione um passo sem querer e queira apagar
+    function removerEtapa(numero) {
+        const etapa = document.getElementById('etapa_' + numero);
+        if (etapa) {
+            etapa.remove();
+        }
+    }
+</script>
 </body>
 </html>
