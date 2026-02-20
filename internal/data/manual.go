@@ -30,13 +30,16 @@ func InsertManual(manual models.Manual)(int64, error) {
 
 		idEtapa, err = respEtapa.LastInsertId()
 
-		InsertAnexo(etapa.Anexos[idEtapa])
+		for _, anexo := range etapa.Anexos{
+			anexo.Etapa_id = int(idEtapa)
+			InsertAnexo(anexo)
+		}
 	
 	}
 	return id, nil
 }
 func GetManuais()[]models.Manual{
-	query := "SELECT id, titulo, conteudo, secao FROM manuais"
+	query := "SELECT id, titulo, secao FROM manuais"
 	var list []models.Manual
 	queryResult, err := DB.Query(query)
 	
@@ -47,7 +50,7 @@ func GetManuais()[]models.Manual{
 
 	for queryResult.Next(){
 		var m models.Manual
-		queryResult.Scan(&m.ID, &m.Titulo, &m.Conteudo, &m.Secao)
+		queryResult.Scan(&m.ID, &m.Titulo, &m.Secao)
 		list = append(list, m)
 	}
 	
@@ -55,18 +58,18 @@ func GetManuais()[]models.Manual{
 }
 
 func GetManualByID(id int) (models.Manual, error){
-	query := `SELECT id, titulo, conteudo, secao FROM manuais WHERE id = ?`
+	query := `SELECT id, titulo, secao FROM manuais WHERE id = ?`
 	var result models.Manual
-	err := DB.QueryRow(query, id).Scan(&result.ID, &result.Titulo, &result.Conteudo, &result.Secao)
+	err := DB.QueryRow(query, id).Scan(&result.ID, &result.Titulo, &result.Secao)
 
 
 	if err != nil{
 		return models.Manual{}, err
 	}
-	queryAnexos := `SELECT id, nome, tamanho, caminho, tipo_arquivo, manual_id, ordem_apresentacao 
-	FROM anexos WHERE manual_id = ? ORDER BY ordem_apresentacao ASC`
+	queryEtapas := `SELECT id, manual_id, ordem_apresentacao, conteudo FROM etapas WHERE manual_id = ? ORDER BY ordem_apresentacao ASC`
 
-	rows, err := DB.Query(queryAnexos, id)
+
+	rows, err := DB.Query(queryEtapas, id)
 
 	if err != nil{
 		return result, err
@@ -74,35 +77,56 @@ func GetManualByID(id int) (models.Manual, error){
 	defer rows.Close()
 
 	for rows.Next(){
-		var a models.Anexo
+		var a models.Etapa
 
-		err := rows.Scan(&a.ID, &a.Nome, &a.Tamanho_bytes, &a.Caminho, &a.Tipo_arquivo, &a.Manual_id, &a.OrdemApresentacao)
+		err := rows.Scan(&a.Id, &a.Manual_id, &a.Ordem_apresentacao, &a.Conteudo)
+		queryAnexos := `SELECT id, nome, tamanho, caminho, tipo_arquivo, etapa_id, ordem_apresentacao FROM anexos WHERE etapa_id = ?`
 
+		rowsAnexos, err := DB.Query(queryAnexos, a.Id)
 		if err != nil{
-			return result, err
+			return models.Manual{}, err
 		}
-		result.Arquivos = append(result.Arquivos, a)
+		defer rowsAnexos.Close()
+
+		for rowsAnexos.Next(){
+			var novoAnexo models.Anexo
+			rowsAnexos.Scan(&novoAnexo.ID, &novoAnexo.Nome, &novoAnexo.Tamanho_bytes, &novoAnexo.Caminho, &novoAnexo.Tipo_arquivo, &novoAnexo.Etapa_id, novoAnexo.OrdemApresentacao)
+			a.Anexos = append(a.Anexos, novoAnexo)
+		}
+		
+		result.Etapas = append(result.Etapas, a)
 	}
+
+	
 
 	return result, nil
 }
 
 func DeleteManual(id int) error{
-	query := `DELETE FROM manuais WHERE id = ?`
-	
 	manual, err := GetManualByID(id)
 	if err != nil{
 		return err
 	}
-	for _, arquivo := range manual.Arquivos{
-		caminho := arquivo.Caminho
-		os.Remove(caminho)
+	query := `DELETE FROM manuais WHERE id = ?`
+	queryEtapas := `DELETE FROM etapas WHERE manual_id = ?`
+	queryAnexos := `DELETE FROM anexos WHERE etapa_id = ?`
+	
+	for _, etapa := range manual.Etapas{
+		for _, anexo := range etapa.Anexos{
+			os.Remove(anexo.Caminho)
+		}
+		_, err = DB.Exec(queryAnexos, etapa.Id)
+		if err != nil{
+			return err
+		}
+
 	}
-	queryDeleteAnexos := `DELETE FROM anexos WHERE manual_id = ?`
+	_, err = DB.Exec(queryEtapas, manual.ID)
+	if err != nil{
+		return err
+	}
 
-	_, err = DB.Exec(queryDeleteAnexos, id)
-	_, err = DB.Exec(query, id)
-
+	_, err = DB.Exec(query, manual.ID)
 	
 	return err
 }
@@ -110,11 +134,10 @@ func DeleteManual(id int) error{
 func UpdateManual(m models.Manual) error{
 	query := `UPDATE manuais 
 			  SET titulo = ?,
-			  conteudo = ?,
 			  secao = ?
 			  WHERE id = ?`
 
-	_, err := DB.Exec(query, m.Titulo, m.Conteudo, m.Secao, m.ID)
+	_, err := DB.Exec(query, m.Titulo, m.Secao, m.ID)
 
 	if err != nil {
 		return err
@@ -141,25 +164,25 @@ func DeleteAnexo(idAnexo int) error{
 func InsertAnexo(anexo models.Anexo) error{
 	//preciso descobrir o maior numero da ordem
 	var maiorOrdem int
-	queryMaiorNumero := `SELECT COALESCE(MAX(ordem_apresentacao), 0) FROM anexos WHERE manual_id = ?`
+	queryMaiorNumero := `SELECT COALESCE(MAX(ordem_apresentacao), 0) FROM anexos WHERE etapa_id = ?`
 
-	err := DB.QueryRow(queryMaiorNumero, anexo.Manual_id).Scan(&maiorOrdem)
+	err := DB.QueryRow(queryMaiorNumero, anexo.Etapa_id).Scan(&maiorOrdem)
 	if err != nil{
 		return err
 	}
 	var proxOrdem = maiorOrdem + 1
 
 
-	query := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, manual_id, ordem_apresentacao) VALUES(?, ?, ?, ?, ?, ?)"
-    _, err = DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Manual_id, proxOrdem)
+	query := "INSERT INTO anexos(nome, tamanho, caminho, tipo_arquivo, etapa_id, ordem_apresentacao) VALUES(?, ?, ?, ?, ?, ?)"
+    _, err = DB.Exec(query, anexo.Nome, anexo.Tamanho_bytes, anexo.Caminho, anexo.Tipo_arquivo, anexo.Etapa_id, proxOrdem)
     return err
 }
 func ReordenarAnexoData(idAnexo int, direcao string) error{
 	var ordemAtual int
-	var manualId int
+	var etapaId int
 
-	queryAnexoAtual := `SELECT ordem_apresentacao, manual_id FROM anexos WHERE id = ?`
-	err := DB.QueryRow(queryAnexoAtual, idAnexo).Scan(&ordemAtual, &manualId)
+	queryAnexoAtual := `SELECT ordem_apresentacao, etapa_id FROM anexos WHERE id = ?`
+	err := DB.QueryRow(queryAnexoAtual, idAnexo).Scan(&ordemAtual, &etapaId)
 	if err != nil{
 		return err
 	}
@@ -167,10 +190,10 @@ func ReordenarAnexoData(idAnexo int, direcao string) error{
 		var ordemProx int
 		var proxAnexoID int
 
-		queryProxAnexo := `SELECT ordem_apresentacao, id FROM anexos WHERE manual_id = ? AND ordem_apresentacao < ?
+		queryProxAnexo := `SELECT ordem_apresentacao, id FROM anexos WHERE etapa_id = ? AND ordem_apresentacao < ?
 		ORDER BY ordem_apresentacao DESC LIMIT 1`
 		
-		err = DB.QueryRow(queryProxAnexo, manualId, ordemAtual).Scan(&ordemProx, &proxAnexoID)
+		err = DB.QueryRow(queryProxAnexo, etapaId, ordemAtual).Scan(&ordemProx, &proxAnexoID)
 
 		queryUpdateAnexoAtual := `UPDATE anexos
 		SET ordem_apresentacao = ?
@@ -197,10 +220,10 @@ func ReordenarAnexoData(idAnexo int, direcao string) error{
 		var ordemAnterior int
 		var anexoAnteriorID int
 
-		queryAnexoAnterior := `SELECT ordem_apresentacao, id FROM anexos WHERE manual_id = ? AND ordem_apresentacao > ?
+		queryAnexoAnterior := `SELECT ordem_apresentacao, id FROM anexos WHERE etapa_id = ? AND ordem_apresentacao > ?
 		ORDER BY ordem_apresentacao ASC LIMIT 1`
 
-		err = DB.QueryRow(queryAnexoAnterior, manualId, ordemAtual).Scan(&ordemAnterior, &anexoAnteriorID)
+		err = DB.QueryRow(queryAnexoAnterior, etapaId, ordemAtual).Scan(&ordemAnterior, &anexoAnteriorID)
 		if err != nil{
 			return err
 		}

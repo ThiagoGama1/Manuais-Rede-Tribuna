@@ -30,7 +30,7 @@ func LoadDatabase(){
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	manual_id INTEGER,
 	ordem_apresentacao INTEGER NOT NULL,
-	conteudo TEXT
+	conteudo TEXT,
 	FOREIGN KEY(manual_id) REFERENCES manuais(id)
 	);`
 	

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,7 +38,6 @@ func ExibirManualPorId(c *gin.Context){
 func CriarManual(c *gin.Context){
 	novoId := 0
 	inputTitulo := c.PostForm("titulo")
-	inputConteudo := c.PostForm("conteudo")
 	inputSecao := c.PostForm("secao") 
 	form, err := c.MultipartForm()
 	totalStr := c.PostForm("total_etapas")
@@ -62,6 +62,7 @@ func CriarManual(c *gin.Context){
 
 		for indice, arquivo := range arquivos{
 			var anexo models.Anexo
+			prefixo := time.Now().UnixNano()
 			anexo.Nome = arquivo.Filename
 			anexo.Tamanho_bytes = int(arquivo.Size)
 			anexo.Tipo_arquivo = arquivo.Header.Get("Content-Type")
@@ -77,14 +78,18 @@ func CriarManual(c *gin.Context){
 	var novoManual models.Manual
 	
 
-	if strings.TrimSpace(inputTitulo) == "" || strings.TrimSpace(inputConteudo) == "" || strings.TrimSpace(inputSecao) == ""{
+	if strings.TrimSpace(inputTitulo) == "" || strings.TrimSpace(inputSecao) == ""{
 		c.Redirect(http.StatusFound, "/novo")
 		return
 	}
 	
 	
 	novoManual = models.Manual{ID: novoId, Titulo: inputTitulo, Secao: inputSecao, Etapas: listaEtapas}
-	data.InsertManual(novoManual)
+	_, err = data.InsertManual(novoManual)
+	if err != nil{
+		c.Redirect(http.StatusInternalServerError, "/")
+		return
+	}
 	c.Redirect(http.StatusSeeOther, "/?msg=criado")
 }
 
