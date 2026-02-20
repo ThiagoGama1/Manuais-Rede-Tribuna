@@ -7,8 +7,8 @@ import (
 
 
 func InsertManual(manual models.Manual)(int64, error) {
-	stmt := "INSERT INTO manuais(titulo, conteudo, secao) VALUES(?, ?, ?)"
-	resp, err := DB.Exec(stmt, manual.Titulo, manual.Conteudo, manual.Secao)
+	stmt := "INSERT INTO manuais(titulo, secao) VALUES(?, ?)"
+	resp, err := DB.Exec(stmt, manual.Titulo, manual.Secao)
 	
 	if err != nil{
 		return 0, err
@@ -18,9 +18,20 @@ func InsertManual(manual models.Manual)(int64, error) {
 	if err != nil{
 		return 0, err
 	}
-	for _, anexo := range manual.Arquivos{
-		anexo.Manual_id = int(id)
-		InsertAnexo(anexo)
+	for i, etapa := range manual.Etapas{
+		etapa.Manual_id = int(id)
+		stmtEtapa := `INSERT INTO etapas(manual_id, ordem_apresentacao, conteudo) VALUES(?, ?, ?)`
+
+		respEtapa, err := DB.Exec(stmtEtapa, etapa.Manual_id,i+1, etapa.Conteudo)
+		if err != nil{
+			return 0, err
+		}
+		var idEtapa int64
+
+		idEtapa, err = respEtapa.LastInsertId()
+
+		InsertAnexo(etapa.Anexos[idEtapa])
+	
 	}
 	return id, nil
 }

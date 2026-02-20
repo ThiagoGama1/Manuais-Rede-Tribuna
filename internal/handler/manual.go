@@ -48,7 +48,7 @@ func CriarManual(c *gin.Context){
 	}
 	var listaEtapas []models.Etapa
 
-	for i := 1; i <= totalEtapas; i++{
+	for i := 1; i <= totalEtapas; i++{   // nao sei mais o que eu estou fazendo
 		nomeCampoTexto := fmt.Sprintf("conteudo_etapa_%d", i)
 		conteudoTexto := c.PostForm(nomeCampoTexto)
 
@@ -58,38 +58,32 @@ func CriarManual(c *gin.Context){
 		var novaEtapa models.Etapa
 		novaEtapa.Conteudo = conteudoTexto
 		novaEtapa.Ordem_apresentacao = i
-		// parei aqui
+		//loop para arquivos
+
+		for indice, arquivo := range arquivos{
+			var anexo models.Anexo
+			anexo.Nome = arquivo.Filename
+			anexo.Tamanho_bytes = int(arquivo.Size)
+			anexo.Tipo_arquivo = arquivo.Header.Get("Content-Type")
+			anexo.OrdemApresentacao = indice + 1
+			anexo.Caminho = "./uploads/" + arquivo.Filename
+			c.SaveUploadedFile(arquivo, anexo.Caminho)
+			novaEtapa.Anexos = append(novaEtapa.Anexos, anexo)
+		}
+		
+		listaEtapas = append(listaEtapas, novaEtapa)
 	}
 	
 	var novoManual models.Manual
-	if err != nil {
-		c.Redirect(http.StatusSeeOther, "/")
-		return
-	}
+	
 
 	if strings.TrimSpace(inputTitulo) == "" || strings.TrimSpace(inputConteudo) == "" || strings.TrimSpace(inputSecao) == ""{
 		c.Redirect(http.StatusFound, "/novo")
 		return
 	}
-	var listaAnexos []models.Anexo
-	for _, arquivo := range form.File["arquivos"]{
-		destino := "./uploads/" + arquivo.Filename
-		
-		if err := c.SaveUploadedFile(arquivo, destino); err != nil{
-			log.Println("Erro ao salvar o arquivo:", err)
-			continue
-		}
-
-		novoAnexo := models.Anexo{
-			Nome: arquivo.Filename,
-			Tamanho_bytes: int(arquivo.Size),
-			Caminho: destino,
-			Tipo_arquivo: arquivo.Header.Get("Content-Type"),
-		}
-		listaAnexos = append(listaAnexos, novoAnexo)
-	}
 	
-	novoManual = models.Manual{ID: novoId, Titulo: inputTitulo, Conteudo: inputConteudo, Secao: inputSecao, Arquivos: listaAnexos}
+	
+	novoManual = models.Manual{ID: novoId, Titulo: inputTitulo, Secao: inputSecao, Etapas: listaEtapas}
 	data.InsertManual(novoManual)
 	c.Redirect(http.StatusSeeOther, "/?msg=criado")
 }

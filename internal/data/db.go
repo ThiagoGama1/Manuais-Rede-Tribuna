@@ -22,9 +22,7 @@ func LoadDatabase(){
 	CREATE TABLE IF NOT EXISTS manuais (
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 	titulo TEXT,
-	conteudo TEXT,
-	secao TEXT,
-	arquivo TEXT
+	secao TEXT
 	);`
 
 	sqlCreateTable2 := `
